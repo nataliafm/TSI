@@ -5,7 +5,7 @@
     (posicion_jugador ?x - jugador ?y - zona)             ;el jugador x está en la zona y
     (direccion_jugador ?x - jugador ?y - orientacion)     ;está el jugador x mirando al norte, sur, etc?
     (conectadas ?x - zona ?y - zona)                      ;están dos zonas conectadas?
-    (posicion_zonas ?x - zona ?y - orientacion ?z - zona) ;la zona x está en la posición y respecto de la zona z?
+    (posicion_zonas ?x - zona ?y - orientacion ?z - zona) ;la zona x está en la posición y respecto de la zona z
     (posicion_objeto ?x - objeto ?y - zona)               ;está un objeto x en la zona y?
     (jugador_tiene_objeto ?x - jugador ?y - objeto)       ;el jugador x tiene el objeto y
     (personaje_tiene_objeto ?x - personaje ?y - objeto)   ;el personaje x tiene el objeto y
@@ -63,10 +63,10 @@
     :parameters (?x - jugador) ;hay un jugador
     :effect
     (and
-      (when (direccion_jugador ?x norte) (direccion_jugador ?x este)) ;si está mirando al norte, mira al este
-      (when (direccion_jugador ?x este) (direccion_jugador ?x sur)) ;si está mirando al este, mira al sur
-      (when (direccion_jugador ?x sur) (direccion_jugador ?x oeste)) ;si está mirando al sur, mira al oeste
-      (when (direccion_jugador ?x oeste) (direccion_jugador ?x norte))  ;si está mirando al oeste, mira al norte
+      (when (direccion_jugador ?x norte) (and (not (direccion_jugador ?x norte)) (direccion_jugador ?x este))) ;si está mirando al norte, mira al este
+      (when (direccion_jugador ?x este) (and (not (direccion_jugador ?x este)) (direccion_jugador ?x sur))) ;si está mirando al este, mira al sur
+      (when (direccion_jugador ?x sur) (and (not (direccion_jugador ?x sur)) (direccion_jugador ?x oeste))) ;si está mirando al sur, mira al oeste
+      (when (direccion_jugador ?x oeste) (and (not (direccion_jugador ?x oeste)) (direccion_jugador ?x norte)))  ;si está mirando al oeste, mira al norte
     )
   )
 
