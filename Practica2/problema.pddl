@@ -2,8 +2,35 @@
   (problem BELKAN1)
   (:domain BELKAN)
   (:objects Z1 Z2 Z3 Z4 Z5 Z6 Z7 Z8 Z9 Z10 Z11 Z12 Z13 Z14 Z15 Z16 Z17 Z18 Z19 Z20 Z21 Z22 Z23 Z24 Z25 - zona
-            norte sur este oeste - orientacion)
+            norte sur este oeste - orientacion
+            leo princesa principe bruja profesor - personaje
+            oscar algoritmo rosa oro manzana - objeto
+            PLAYER - jugador)
   (:INIT
+    (personaje_sin_objeto leo)
+    (posicion_personaje leo Z11)
+    (posicion_objeto oscar Z8)
+
+    (personaje_sin_objeto princesa)
+    (posicion_personaje princesa Z20)
+    (posicion_objeto rosa Z13)
+
+    (personaje_sin_objeto bruja)
+    (posicion_personaje bruja Z10)
+    (posicion_objeto manzana Z14)
+
+    (personaje_sin_objeto principe)
+    (posicion_personaje principe Z6)
+    (posicion_objeto oro Z17)
+
+    (personaje_sin_objeto profesor)
+    (posicion_personaje profesor Z9)
+    (posicion_objeto algoritmo Z16)
+
+    (jugador_sin_objeto PLAYER)
+    (posicion_jugador PLAYER Z1)
+    (direccion_jugador PLAYER norte)
+
     (conectadas Z1 Z2)
     (conectadas Z2 Z1)
     (posicion_zonas Z2 norte Z1)
@@ -135,5 +162,5 @@
     (posicion_zonas Z20 sur Z19)
   )
 
-  (:goal (personaje_tiene_objeto P O))
+  (:goal (and (personaje_tiene_objeto leo oscar) (personaje_tiene_objeto princesa rosa) (personaje_tiene_objeto principe oro) (personaje_tiene_objeto profesor algoritmo) (personaje_tiene_objeto bruja manzana)))
 )
