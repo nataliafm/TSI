@@ -59,6 +59,7 @@ int main(int argc, char *argv[]){
   vector<string> todas_zonas;
   vector<pair<string,string> > todos_objetos;
   vector<vector<pair<string,string> > > zonas_conectadasV, zonas_conectadasH;
+  vector<vector<int> > costes_totalV, costes_totalH;
 
   int pos = 0;
   int contador = 0;
@@ -69,6 +70,7 @@ int main(int argc, char *argv[]){
     pos = 0;
     if (line.substr(pos,1) == "H"){
       vector<pair<string,string> > zonas_conectadas_horizontal;
+      vector<int> costes;
       //1 - 4 --> " -> "
       pos += 5;
       //lee el resto de la línea
@@ -100,19 +102,26 @@ int main(int argc, char *argv[]){
             objetos.push_back(make_pair(objeto,clase));
             if (line.substr(pos,1) != "\n"){ //si no ha llegado al final
               pos++; //espacio entre zonas
-              if (line.substr(pos,1) != ""){
-                pos++; //siguiente zona
-              }
             }
           }
           else{
-            pos++;
-            if (line.substr(pos,1) != ""){
-              pos++;
-            }
+            pos++; //=
             //no hay nada en la zona -> mete strings vacíos
             objetos.push_back(make_pair(" ", " "));
           }
+          if (line.substr(pos,1) != ""){
+            pos++;
+            string numero;
+            while (line.substr(pos,1) != "="){
+              numero.append(line.substr(pos,1));
+              pos++;
+            }
+            if (pos < line.length()){
+              pos++;//=
+            }
+            costes.push_back(atoi(numero.c_str()));
+          }
+
           contador++;
         }
       //ya ha leído todas las zonas y los objetos que tienen dentro
@@ -121,13 +130,14 @@ int main(int argc, char *argv[]){
       }
       zonas_conectadasH.push_back(zonas_conectadas_horizontal);
 
-      //todas_zonas.push_back(zonas);
+      costes_totalH.push_back(costes);
+
       todas_zonas.insert(todas_zonas.end(), zonas.begin(), zonas.end());
-      //todos_objetos.push_back(objetos);
       todos_objetos.insert(todos_objetos.end(), objetos.begin(), objetos.end());
     }
     else if (line.substr(pos,1) == "V"){
       vector<pair<string,string> > zonas_conectadas_vertical;
+      vector<int> costes;
       //1 - 4 --> " -> "
       pos += 5;
       //lee el resto de la línea
@@ -158,19 +168,26 @@ int main(int argc, char *argv[]){
             }
             objetos.push_back(make_pair(objeto,clase));
             if (line.substr(pos,1) != "\n"){ //si no ha llegado al final
-              pos++; //espacio entre zonas
-              if (line.substr(pos,1) != ""){
-                pos++; //siguiente zona
-              }
+              pos++; //=
             }
           }
           else{
-            pos++;
-            if (line.substr(pos,1) != ""){
-              pos++;
-            }
+            pos++; //=
             //no hay nada en la zona -> mete strings vacíos
             objetos.push_back(make_pair(" ", " "));
+          }
+
+          if (line.substr(pos,1) != ""){
+            pos++;
+            string numero;
+            while (line.substr(pos,1) != "="){
+              numero.append(line.substr(pos,1));
+              pos++;
+            }
+            if (pos < line.length()){
+              pos++;//=
+            }
+            costes.push_back(atoi(numero.c_str()));
           }
           contador++;
         }
@@ -180,9 +197,9 @@ int main(int argc, char *argv[]){
       }
       zonas_conectadasV.push_back(zonas_conectadas_vertical);
 
-      //todas_zonas.push_back(zonas);
+      costes_totalV.push_back(costes);
+
       todas_zonas.insert(todas_zonas.end(), zonas.begin(), zonas.end());
-      //todos_objetos.push_back(objetos);
       todos_objetos.insert(todos_objetos.end(), objetos.begin(), objetos.end());
     }
     num_objetos.push_back(contador);
@@ -253,7 +270,7 @@ int main(int argc, char *argv[]){
       string zona = todas_zonas[contador];
       salida << "(posicion_jugador " << it_obj->first << " " << zona << ") ";
 
-      salida << "(direccion_jugador norte)";
+      salida << "(direccion_jugador " << it_obj->first << " norte)";
     }
     else if (it_obj->first != " "){
       string zona = todas_zonas[contador];
@@ -262,6 +279,7 @@ int main(int argc, char *argv[]){
     contador++;
   }
 
+  int i = 0;
   vector<vector<pair<string,string> > >::iterator iterador;
   for (iterador = zonas_conectadasH.begin() ; iterador != zonas_conectadasH.end() ; iterador++){
     contador = 0;
@@ -270,10 +288,13 @@ int main(int argc, char *argv[]){
       salida << "(posicion_zonas " << it_obj->first << " oeste " << it_obj->second << ") ";
       salida << "(conectadas " << it_obj->second << " " << it_obj->first << ") ";
       salida << "(posicion_zonas " << it_obj->second << " este " << it_obj->first << ") ";
+      salida << "(= (distancia " << it_obj->first << " " << it_obj->second << ") " << costes_totalH[i][contador] << ") ";
+      salida << "(= (distancia " << it_obj->second << " " << it_obj->first << ") " << costes_totalH[i][contador] << ") ";
       contador++;
     }
   }
 
+  i = 0;
   for (iterador = zonas_conectadasV.begin() ; iterador != zonas_conectadasV.end() ; iterador++){
     contador = 0;
     for (it_obj = iterador->begin() ; it_obj != iterador->end() ; it_obj++){
@@ -281,10 +302,16 @@ int main(int argc, char *argv[]){
       salida << "(posicion_zonas " << it_obj->first << " norte " << it_obj->second << ") ";
       salida << "(conectadas " << it_obj->second << " " << it_obj->first << ") ";
       salida << "(posicion_zonas " << it_obj->second << " sur " << it_obj->first << ") ";
+      salida << "(= (distancia " << it_obj->first << " " << it_obj->second << ") " << costes_totalH[i][contador] << ") ";
+      salida << "(= (distancia " << it_obj->second << " " << it_obj->first << ") " << costes_totalH[i][contador] << ") ";
       contador++;
     }
   }
 
+  salida << "(= (distancia_total) 0)" << endl;
+
+
+  salida << ")";
   salida << ")";
   salida.close();
   myfile.close();
