@@ -1,5 +1,5 @@
 (define (domain BELKAN)
-  (:requirements :strips :typing)
+  (:requirements :strips :typing :fluents)
   (:types jugador personaje objeto zona orientacion)
   (:predicates
     (posicion_jugador ?x - jugador ?y - zona)             ;el jugador x está en la zona y
@@ -14,6 +14,11 @@
     (posicion_personaje ?x - personaje ?y - zona)         ;el personaje x está en la zona y
   )
 
+  (:functions
+    (distancia ?x ?y - zona)
+    (distancia_total)
+  )
+
   (:action mover_jugador
     :parameters (?x - jugador ?z1 - zona ?z2 - zona ?o - orientacion) ;z1 = zona original z2 = zona a la que se va a mover
     ; el jugador está en la zona original. Esta tiene la zona objetivo en la dirección ?o, y el personaje está mirando en esa dirección. Las dos zonas están conectadas
@@ -22,6 +27,7 @@
     (and
       (not (posicion_jugador ?x ?z1)) ;el jugador ya no está en la zona 1
       (posicion_jugador ?x ?z2) ;el jugador está en la zona 2
+      (increase (distancia_total) (distancia ?z1 ?z2))
     )
   )
 
