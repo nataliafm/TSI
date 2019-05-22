@@ -9,7 +9,6 @@
     (posicion_objeto ?x - objeto ?y - zona)               ;está un objeto x en la zona y?
     (jugador_tiene_objeto ?x - jugador ?y - objeto)       ;el jugador x tiene el objeto y
     (personaje_tiene_objeto ?x - personaje ?y - objeto)   ;el personaje x tiene el objeto y
-    (jugador_sin_objeto ?x - jugador)                     ;el jugador x tiene las manos vacías
     (posicion_personaje ?x - personaje ?y - zona)         ;el personaje x está en la zona y
     (jugador_mochila_vacia ?x - jugador)                  ;el jugador x no tiene nada en la mochila
     (jugador_mochila_llena ?x - jugador ?y - objeto)      ;el jugador x tiene el objeto y en la mochila
@@ -24,6 +23,8 @@
     (objeto_es_bikini ?o - objeto)                        ;el objeto o es un bikini
     (jugador_es_picker ?x - jugador)
     (jugador_es_dealer ?x - jugador)
+    (jugador_manos_llenas ?x - jugador ?y - objeto)
+    (jugador_manos_vacias ?x - jugador)
   )
 
   (:functions
@@ -50,11 +51,12 @@
 
   (:action entregar_objeto
     :parameters (?x - jugador ?y - objeto ?z - zona ?p - personaje)
-    :precondition (and (jugador_es_dealer ?x) (or (jugador_tiene_objeto ?x ?y) (jugador_mochila_llena ?x ?y)) (posicion_jugador ?x ?z) (posicion_personaje ?p ?z) (< (num_objetos_personaje ?p) (max_objetos_personaje ?p))) ; el jugador tiene un objeto, el personaje tiene las manos vacías, y están en la misma zona
+    :precondition (and (jugador_es_dealer ?x) (jugador_tiene_objeto ?x ?y) (posicion_jugador ?x ?z) (posicion_personaje ?p ?z) (< (num_objetos_personaje ?p) (max_objetos_personaje ?p))) ; el jugador tiene un objeto, el personaje tiene las manos vacías, y están en la misma zona
     :effect
     (and
-      (when (jugador_tiene_objeto ?x ?y) (and (not (jugador_tiene_objeto ?x ?y)) (jugador_sin_objeto ?x)))
+      (not (jugador_tiene_objeto ?x ?y))
       (when (jugador_mochila_llena ?x ?y) (and (not (jugador_mochila_llena ?x ?y)) (jugador_mochila_vacia ?x)))
+      (when (jugador_manos_llenas ?x ?y) (and (not (jugador_manos_llenas ?x ?y)) (jugador_manos_vacias ?x)))
 
       (increase (puntos_jugador ?x) (puntos ?p ?y))
       (personaje_tiene_objeto ?p ?y)
@@ -64,11 +66,12 @@
 
   (:action dejar_objeto
     :parameters (?x - jugador ?y - objeto ?z - zona) ;hay un jugador y un objeto en una zona
-    :precondition (and (or (jugador_tiene_objeto ?x ?y) (jugador_mochila_llena ?x ?y)) (posicion_jugador ?x ?z)) ;el jugador tiene el objeto y está en la zona z
+    :precondition (and (jugador_tiene_objeto ?x ?y) (posicion_jugador ?x ?z)) ;el jugador tiene el objeto y está en la zona z
     :effect
     (and
-      (when (jugador_tiene_objeto ?x ?y) (and (not (jugador_tiene_objeto ?x ?y)) (jugador_sin_objeto ?x)))
+      (not (jugador_tiene_objeto ?x ?y))
       (when (jugador_mochila_llena ?x ?y) (and (not (jugador_mochila_llena ?x ?y)) (jugador_mochila_vacia ?x)))
+      (when (jugador_manos_llenas ?x ?y) (and (not (jugador_manos_llenas ?x ?y)) (jugador_manos_vacias ?x)))
 
       (posicion_objeto ?y ?z)
       (when (and (jugador_tiene_zapatilla ?x) (objeto_es_zapatilla ?y)) (not (jugador_tiene_zapatilla ?x)))
@@ -78,12 +81,13 @@
 
   (:action jugador_coge_objeto
     :parameters (?x - jugador ?y - objeto ?z - zona) ;hay un jugador y un objeto en una zona
-    :precondition (and (jugador_sin_objeto ?x) (posicion_jugador ?x ?z) (posicion_objeto ?y ?z) (jugador_es_picker ?x))
+    :precondition (and (jugador_manos_vacias ?x) (posicion_jugador ?x ?z) (posicion_objeto ?y ?z) (jugador_es_picker ?x))
     :effect
     (and
-      (not (jugador_sin_objeto ?x))
       (not (posicion_objeto ?y ?z))
+      (not (jugador_manos_vacias ?x))
       (jugador_tiene_objeto ?x ?y)
+      (jugador_manos_llenas ?x ?y)
 
       (when (objeto_es_bikini ?y) (jugador_tiene_bikini ?x))
       (when (objeto_es_zapatilla ?y) (jugador_tiene_zapatilla ?x))
@@ -96,21 +100,24 @@
     :effect
     (and
       (not (jugador_tiene_objeto ?x1 ?y))
+      (when (jugador_mochila_llena ?x1 ?y) (and (not (jugador_mochila_llena ?x1 ?y)) (jugador_mochila_vacia ?x1)))
+      (when (jugador_manos_llenas ?x1 ?y) (and (not (jugador_manos_llenas ?x1 ?y)) (jugador_manos_vacias ?x1)))
       (jugador_tiene_objeto ?x2 ?y)
     )
   )
 
   (:action jugador_mete_objeto_en_mochila
     :parameters (?x - jugador ?y1 ?y2 - objeto ?z - zona)
-    :precondition (and (jugador_tiene_objeto ?x ?y1) (jugador_mochila_vacia ?x) (posicion_jugador ?x ?z) (posicion_objeto ?y2 ?z))
+    :precondition (and (jugador_tiene_objeto ?x ?y1) (jugador_manos_llenas ?x ?y1) (jugador_mochila_vacia ?x) (posicion_jugador ?x ?z) (posicion_objeto ?y2 ?z))
     :effect
     (and
       (not (jugador_mochila_vacia ?x))
       (jugador_mochila_llena ?x ?y1)
-      (not (jugador_tiene_objeto ?x ?y1))
 
       (not (posicion_objeto ?y2 ?z))
+      (not (jugador_manos_llenas ?x ?y1))
       (jugador_tiene_objeto ?x ?y2)
+      (jugador_manos_llenas ?x ?y2)
     )
   )
 
