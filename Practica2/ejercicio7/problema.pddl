@@ -22,17 +22,17 @@
     (posicion_personaje profesor Z9)
     (posicion_objeto oscar Z4)
 
-    (jugador_sin_objeto PLAYER1)
     (posicion_jugador PLAYER1 Z1)
     (direccion_jugador PLAYER1 norte)
     (jugador_mochila_vacia PLAYER1)
     (jugador_es_picker PLAYER1)
+    (jugador_manos_vacias PLAYER1)
 
-    (jugador_sin_objeto PLAYER2)
     (posicion_jugador PLAYER2 Z15)
     (direccion_jugador PLAYER2 norte)
     (jugador_mochila_vacia PLAYER2)
     (jugador_es_dealer PLAYER2)
+    (jugador_manos_vacias PLAYER2)
 
     (conectadas Z1 Z2)
     (conectadas Z2 Z1)
